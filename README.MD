@@ -42,6 +42,25 @@ Construct a calculator with `NewGradeCalculator()`, call
 then read `GetFinalGrade()`. Use scores from 0 through 100. The API currently
 does not validate scores or return input errors.
 
+The completed calculator uses a single grade list. Category averages preserve
+fractional values; the final weighted numerical score is truncated before the
+letter lookup. Empty categories contribute zero without redistributing weights,
+and unknown grade types are ignored.
+
+For pass/fail output, use `NewGradeCalculator(PassFail)`. A weighted score of
+70 or higher returns `"Pass"`; lower scores return `"Fail"`.
+`NewGradeCalculator()` and `NewGradeCalculator(Letter)` return letter grades.
+`AddGrade` and `GetFinalGrade` have unchanged signatures. Supply at most one
+constructor mode.
+
+## Completed assignment results
+
+All 10 top-level tests and 16 table subtests pass with 100.0% statement coverage.
+Build and `go vet` also pass. Part 3 coverage was 85.2%; Parts 4 and 6 reached
+100.0%. In an isolated Part 5 experiment, commenting out every `t.Errorf`
+assertion call left coverage at 100.0%; the committed suite retains assertions.
+See `ASSIGNMENT_RESULTS.md` for the separate commits and TDD evidence.
+
 ## Starting repository status (before assignment fixes)
 
 The three provided tests execute, but `TestGetGradeA` and `TestGetGradeB`
