@@ -139,3 +139,45 @@ func TestGradeTypeString(t *testing.T) {
 		}
 	}
 }
+
+func TestPassFailEvaluation(t *testing.T) {
+	tests := []struct {
+		name        string
+		assignments int
+		exams       int
+		essays      int
+		want        string
+	}{
+		{"above passing", 100, 100, 100, "Pass"},
+		{"C boundary passes", 70, 70, 70, "Pass"},
+		{"below C fails", 69, 69, 69, "Fail"},
+		{"zero fails", 0, 0, 0, "Fail"},
+		{"weighted boundary passes", 70, 100, 0, "Pass"},
+		{"weighted below boundary fails", 100, 0, 100, "Fail"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gc := NewGradeCalculator(PassFail)
+			gc.AddGrade("assignment", tt.assignments, Assignment)
+			gc.AddGrade("exam", tt.exams, Exam)
+			gc.AddGrade("essay", tt.essays, Essay)
+			if got := gc.GetFinalGrade(); got != tt.want {
+				t.Errorf("want %s, got %s", tt.want, got)
+			}
+		})
+	}
+}
+
+func TestEvaluationModeCompatibility(t *testing.T) {
+	for _, gc := range []*GradeCalculator{NewGradeCalculator(), NewGradeCalculator(Letter)} {
+		gc.AddGrade("assignment", 70, Assignment)
+		gc.AddGrade("exam", 70, Exam)
+		gc.AddGrade("essay", 70, Essay)
+		if got := gc.GetFinalGrade(); got != "C" {
+			t.Errorf("default and explicit letter mode: want C, got %s", got)
+		}
+	}
+	if got := NewGradeCalculator(PassFail).GetFinalGrade(); got != "Fail" {
+		t.Errorf("empty pass/fail calculator: want Fail, got %s", got)
+	}
+}
